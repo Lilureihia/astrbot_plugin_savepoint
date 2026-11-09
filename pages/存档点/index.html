@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>存档点 SavePoint v1.1.0 · 节点图文补充管理器</title>
+  <style>
+    :root {
+      --bg-dark: #0f111a;
+      --bg-card: #181b28;
+      --bg-card-hover: #1f2335;
+      --bg-input: #12141f;
+      --border-color: #2a2f45;
+      --accent-primary: #7c5cff;
+      --accent-glow: rgba(124, 92, 255, 0.35);
+      --accent-fire: #ff8c42;
+      --accent-fire-glow: rgba(255, 140, 66, 0.35);
+      --text-main: #e4e8f7;
+      --text-muted: #8b92b2;
+      --danger: #ff5370;
+      --success: #4fd6be;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(90deg, #141724 0%, #1d1936 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #231f38;
+      border: 1px solid var(--accent-fire);
+      box-shadow: 0 0 12px var(--accent-fire-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      overflow: hidden;
+    }
+
+    .brand-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    .brand-title h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .active-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 140, 66, 0.12);
+      border: 1px solid rgba(255, 140, 66, 0.45);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #ffd0b0;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-fire);
+      box-shadow: 0 0 8px var(--accent-fire);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.65; }
+    }
+
+    .main-container {
+      display: grid;
+      grid-template-columns: 450px 1fr;
+      gap: 20px;
+      padding: 20px 24px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    @media (max-width: 1080px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .panel-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slot-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slot-card:hover {
+      border-color: #454d70;
+      background: var(--bg-card-hover);
+    }
+
+    .slot-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+
+    .slot-card.active-fire {
+      border-color: var(--accent-fire);
+      box-shadow: 0 0 14px rgba(255, 140, 66, 0.18);
+    }
+
+    .slot-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .slot-title {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .badge-fire {
+      background: rgba(255, 140, 66, 0.2);
+      color: #ffab73;
+      border: 1px solid rgba(255, 140, 66, 0.4);
+    }
+
+    .badge-tag {
+      background: rgba(124, 92, 255, 0.18);
+      color: #b7a4ff;
+      border: 1px solid rgba(124, 92, 255, 0.35);
+    }
+
+    /* 字段加载属性提示徽章 */
+    .field-status {
+      display: inline-block;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+      font-weight: 500;
+    }
+
+    .status-loaded {
+      background: rgba(79, 214, 190, 0.14);
+      color: #4fd6be;
+      border: 1px solid rgba(79, 214, 190, 0.35);
+    }
+
+    .status-note {
+      background: rgba(139, 146, 178, 0.14);
+      color: #9aa3c4;
+      border: 1px solid rgba(139, 146, 178, 0.28);
+    }
+
+    .slot-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slot-tags-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.2s;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent-primary);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+      line-height: 1.5;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      background: #262b40;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      background: #323854;
+    }
+
+    button.btn-primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #fff;
+    }
+
+    button.btn-primary:hover {
+      background: #6946ff;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    button.btn-fire {
+      background: var(--accent-fire);
+      border-color: var(--accent-fire);
+      color: #12141f;
+      font-weight: 600;
+    }
+
+    button.btn-fire:hover {
+      background: #ff9d5c;
+      box-shadow: 0 0 12px var(--accent-fire-glow);
+    }
+
+    button.btn-danger {
+      background: rgba(255, 83, 112, 0.15);
+      border-color: rgba(255, 83, 112, 0.4);
+      color: #ff8096;
+    }
+
+    button.btn-danger:hover {
+      background: rgba(255, 83, 112, 0.28);
+    }
+
+    button.btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .mounted-tag-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #141724;
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .mounted-tag-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .mounted-thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #23273a;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .upload-zone {
+      border: 1.5px dashed #3b4262;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      background: var(--bg-input);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent-primary);
+      background: rgba(124, 92, 255, 0.06);
+    }
+
+    .upload-preview {
+      max-height: 210px;
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 8px;
+      border: 1px solid var(--border-color);
+      display: none;
+    }
+
+    .preview-box {
+      background: #10121c;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      color: #a9b2d6;
+      white-space: pre-wrap;
+      max-height: 190px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #22273b;
+      border: 1px solid var(--accent-primary);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon" id="brandIcon">🔥</div>
+      <div class="brand-title">
+        <h1>存档点 SavePoint <span class="badge badge-tag">v1.1.0</span></h1>
+        <p>手动存入当前节点重要的图文信息 · 多 TAG 自由组装与单存档槽切换</p>
+      </div>
+    </div>
+    <div class="active-banner">
+      <span class="pulse-dot"></span>
+      <span id="activeSlotBannerText">正在读取激活槽位...</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- 左栏：存档槽管理与复数 TAG 组装 -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>🏕️ 存档槽管理 (Save Slots)</h2>
+        <button class="btn-sm" onclick="deactivateAll()">⏸️ 全部熄火停用</button>
+      </div>
+
+      <div class="slot-list" id="slotListContainer"></div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 14px; color: #fff;" id="editingSlotHeader">正在配置存档槽</h3>
+          <button class="btn-fire btn-sm" onclick="activateCurrentSelectedSlot()">🔥 点燃并激活此槽位</button>
+        </div>
+
+        <div>
+          <label>
+            槽位名称
+            <span class="field-status status-note">📌 仅面板备注 · 不加载至模型</span>
+            （用于在左侧列表区分不同存档槽，不会消耗 Token）
+          </label>
+          <input type="text" id="slotNameInput" placeholder="例如：存档槽 1 · 日常主线" />
+        </div>
+
+        <div>
+          <label>
+            槽位全局说明
+            <span class="field-status status-loaded">⚡ 会被加载</span>
+            （选填，若填写则会作为本槽位的整体背景说明注入系统提示词，影响模型对当前会话大前提的理解；留空则不加载）
+          </label>
+          <input type="text" id="slotNoteInput" placeholder="选填，例如：当前处于特定剧情分支或工作排障状态（留空则不注入）" />
+        </div>
+
+        <div>
+          <label>
+            📦 往此存档槽挂载 TAG
+            <span class="field-status status-loaded">⚡ 槽内挂载的 TAG 会按顺序合并加载</span>
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <select id="mountTagSelect">
+              <option value="">-- 从下拉菜单选择已保存的 TAG --</option>
+            </select>
+            <button class="btn-primary" style="flex-shrink: 0;" onclick="mountSelectedTagToSlot()">+ 挂入槽位</button>
+          </div>
+        </div>
+
+        <div>
+          <label>当前槽位已挂载的 TAG 列表（从上到下按顺序注入大模型）</label>
+          <div id="mountedTagsContainer"></div>
+        </div>
+
+        <div class="btn-row" style="justify-content: space-between; padding-top: 4px;">
+          <button class="btn-primary" onclick="saveCurrentSlot()">💾 保存当前槽位配置</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <select id="copyTargetSlotSelect" style="width: auto; padding: 6px 10px; font-size: 12px;"></select>
+            <button class="btn-sm" onclick="copyCurrentSlotTo()">📋 复制到此槽</button>
+          </div>
+        </div>
+
+        <div>
+          <label>👁️ 实时注入预览（以下内容即为激活此槽位后，实际会加载进大模型上下文的全部信息）</label>
+          <div class="preview-box" id="slotPromptPreview">暂无挂载内容</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏：TAG 图文资产库编辑器 -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>🏷️ TAG 信息库编辑器 (图片 + 描述 + 提示词)</h2>
+        <button class="btn-primary btn-sm" onclick="resetTagEditorForNew()">+ 新建空白 TAG</button>
+      </div>
+
+      <div>
+        <label>🔍 下拉选择已有 TAG 进行查看或编辑</label>
+        <select id="tagSelectorDropdown" onchange="onSelectTagFromDropdown(this.value)">
+          <option value="">-- ✨ 新建空白 TAG 条目 --</option>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div>
+          <label>
+            TAG 标识名称 <span style="color: var(--danger);">*</span>
+            <span class="field-status status-loaded">⚡ 会被加载</span>
+            <br/>（作为注入条目的分类小标题加载，帮助模型识别该条信息的维度，如“当前场景”“视觉特征”）
+          </label>
+          <input type="text" id="tagNameInput" placeholder="例如：当前场景 / 视觉参考 / 临时规则" />
+        </div>
+        <div>
+          <label>
+            面板备注摘要
+            <span class="field-status status-note">📌 仅面板备注 · 不加载至模型</span>
+            <br/>（选填，仅用于在下拉菜单与列表中帮你区分不同版本或用途，完全不消耗 Token）
+          </label>
+          <input type="text" id="tagTitleInput" placeholder="例如：v2微调版 / 仅周末使用（不会注入模型）" />
+        </div>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label style="margin-bottom: 0;">
+            🖼️ 参考图片上传
+            <span class="field-status status-loaded">⚡ 会被加载至视觉通道</span>
+            （选填，开启多模态注入后直接传入模型视觉输入，影响模型对角色外观、场景画面或物品细节的视觉感知）
+          </label>
+          <button class="btn-danger btn-sm" id="clearImgBtn" style="display: none;" onclick="clearCurrentTagImage()">清除图片</button>
+        </div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)" />
+          <div id="uploadHintText" style="color: var(--text-muted); font-size: 13px;">
+            点击此处选择图片，或直接将图片拖拽到这里<br/>
+            <span style="font-size: 11px; opacity: 0.75;">支持 PNG / JPG / WEBP / GIF，持久化保存在 plugin_data 目录</span>
+          </div>
+          <img id="tagImagePreview" class="upload-preview" alt="预览图" />
+        </div>
+      </div>
+
+      <div>
+        <label>
+          📝 补充描述
+          <span class="field-status status-loaded">⚡ 会被加载至系统提示词</span>
+          （选填，作为客观背景事实与设定说明注入，影响大模型对当前所处环境、参考图细节或事件前因后果的认知；留空则不加载）
+        </label>
+        <textarea id="tagDescInput" placeholder="填写需要模型知晓的客观事实、场景细节或参考图说明（留空则不加载此项）..."></textarea>
+      </div>
+
+      <div>
+        <label>
+          ✨ 核心提示词框 (Prompt)
+          <span class="field-status status-loaded">⚡ 会被加载至系统提示词</span>
+          （选填，作为直接行为指令与规则约束注入，直接影响大模型的回复风格、语气表现、角色状态演绎与回答边界；留空则不加载）
+        </label>
+        <textarea id="tagPromptInput" style="min-height: 110px;" placeholder="填写需要模型严格遵循的扮演要求、语气微调或特殊规则约束（留空则不加载此项）..."></textarea>
+      </div>
+
+      <div class="btn-row" style="justify-content: space-between; margin-top: auto; padding-top: 8px;">
+        <div class="btn-row">
+          <button class="btn-primary" onclick="saveTag(false)">💾 保存至 TAG 库</button>
+          <button class="btn-fire" onclick="saveTag(true)">🔥 保存并立即挂入左侧当前槽位</button>
+        </div>
+        <button class="btn-danger" id="deleteTagBtn" style="display: none;" onclick="deleteCurrentTag()">🗑️ 删除此 TAG</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toastMsg">操作成功</div>
+
+  <script>
+    const PLUGIN_ID = "astrbot_plugin_savepoint";
+    const LOCAL_BASE = `http://${window.location.hostname || '127.0.0.1'}:8765`;
+    const origFetch = window.fetch.bind(window);
+
+    // 智能通信网关：优先使用 AstrBot 官方插件视图 Bridge，其次自适应回退至本地 8765 端口
+    async function apiRequest(subPath, method = "GET", bodyObj = null) {
+      const bridge = window.AstrBotPluginView || window.AstrBotPluginPage;
+      if (bridge) {
+        try {
+          if (typeof bridge.ready === "function") await bridge.ready();
+          let res;
+          if (method === "GET" && typeof bridge.get === "function") {
+            res = await bridge.get(`/${PLUGIN_ID}/${subPath}`);
+          } else if (method === "POST" && typeof bridge.post === "function") {
+            res = await bridge.post(`/${PLUGIN_ID}/${subPath}`, bodyObj || {});
+          } else if (typeof bridge.request === "function") {
+            res = await bridge.request(`/${PLUGIN_ID}/${subPath}`, { method, body: bodyObj || {} });
+          }
+          if (res !== undefined) {
+            if (res && res.status === "ok") return res;
+            if (res && res.data && res.data.status === "ok") return res.data;
+            return res;
+          }
+        } catch (err) {
+          console.warn("Bridge 通道回退至本地端口:", err);
+        }
+      }
+
+      const opts = { method, headers: {} };
+      if (bodyObj) {
+        opts.headers["Content-Type"] = "application/json";
+        opts.body = JSON.stringify(bodyObj);
+      }
+      const targetUrl = window.location.port === "8765" ? `/api/${subPath}` : `${LOCAL_BASE}/api/${subPath}`;
+      const r = await origFetch(targetUrl, opts);
+      return await r.json();
+    }
+
+    let appState = {
+      active_slot_id: "slot_1",
+      tags: {},
+      slots: {}
+    };
+    let selectedSlotId = "slot_1";
+    let currentEditingTagId = "";
+    let pendingImageBase64 = "";
+    let shouldClearImage = false;
+
+    origFetch(`${LOCAL_BASE}/api/logo`).then(r => {
+      if (r.ok) {
+        document.getElementById('brandIcon').innerHTML = `<img src="${LOCAL_BASE}/api/logo" alt="Logo" />`;
+      }
+    }).catch(() => {});
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function getTagImageSrc(t) {
+      if (!t || !t.image) return "";
+      if (t.image_data_url) return t.image_data_url;
+      return `${LOCAL_BASE}/api/images/${encodeURIComponent(t.image)}`;
+    }
+
+    async function fetchState() {
+      try {
+        const json = await apiRequest("state", "GET");
+        if (json && json.status === 'ok') {
+          appState = json.data;
+          if (!appState.slots[selectedSlotId]) {
+            selectedSlotId = Object.keys(appState.slots)[0] || "slot_1";
+          }
+          renderAll();
+        }
+      } catch (e) {
+        showToast("正在连接存档点服务: " + e.message);
+      }
+    }
+
+    function renderAll() {
+      renderBanner();
+      renderSlotList();
+      renderSelectedSlotEditor();
+      renderTagDropdowns();
+    }
+
+    function renderBanner() {
+      const activeId = appState.active_slot_id;
+      const bannerEl = document.getElementById('activeSlotBannerText');
+      if (!activeId || activeId === 'none' || !appState.slots[activeId]) {
+        bannerEl.textContent = "当前状态：所有存档槽已熄火停用（零上下文注入）";
+        return;
+      }
+      const s = appState.slots[activeId];
+      const count = (s.tag_ids || []).length;
+      bannerEl.textContent = `当前生效中：${s.name} （已挂载 ${count} 个 TAG）`;
+    }
+
+    function renderSlotList() {
+      const container = document.getElementById('slotListContainer');
+      container.innerHTML = '';
+      const slotKeys = Object.keys(appState.slots);
+
+      slotKeys.forEach(sid => {
+        const slot = appState.slots[sid];
+        const isSelected = sid === selectedSlotId;
+        const isActive = sid === appState.active_slot_id;
+
+        const card = document.createElement('div');
+        card.className = `slot-card ${isSelected ? 'selected' : ''} ${isActive ? 'active-fire' : ''}`;
+        card.onclick = () => {
+          selectedSlotId = sid;
+          renderAll();
+        };
+
+        const tagPills = (slot.tag_ids || []).map(tid => {
+          const t = appState.tags[tid];
+          return t ? `<span class="badge badge-tag"># ${escapeHtml(t.tag)}</span>` : '';
+        }).join('');
+
+        card.innerHTML = `
+          <div class="slot-top">
+            <div class="slot-title">
+              <span>${isActive ? '🔥' : '🏕️'}</span>
+              <span>${escapeHtml(slot.name || sid)}</span>
+            </div>
+            ${isActive ? '<span class="badge badge-fire">当前激活生效</span>' : '<span class="badge" style="background:#23273a;color:#8b92b2;">待机中</span>'}
+          </div>
+          <div class="slot-tags-preview">
+            ${tagPills || '<span style="font-size:12px;color:#5e6582;">（空槽位，尚未挂载 TAG）</span>'}
+          </div>
+          <div class="slot-meta">
+            <span>${escapeHtml(slot.slot_note ? '全局说明: ' + slot.slot_note : '无全局说明')}</span>
+            <span>${escapeHtml(slot.updated_at || '')}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderSelectedSlotEditor() {
+      const slot = appState.slots[selectedSlotId];
+      if (!slot) return;
+
+      document.getElementById('editingSlotHeader').textContent = `🔧 正在装配：${slot.name}`;
+      document.getElementById('slotNameInput').value = slot.name || '';
+      document.getElementById('slotNoteInput').value = slot.slot_note || '';
+
+      const copySelect = document.getElementById('copyTargetSlotSelect');
+      copySelect.innerHTML = '';
+      Object.keys(appState.slots).forEach(sid => {
+        if (sid !== selectedSlotId) {
+          const opt = document.createElement('option');
+          opt.value = sid;
+          opt.textContent = `目标: ${appState.slots[sid].name}`;
+          copySelect.appendChild(opt);
+        }
+      });
+
+      const mountedContainer = document.getElementById('mountedTagsContainer');
+      mountedContainer.innerHTML = '';
+      const tagIds = slot.tag_ids || [];
+
+      if (tagIds.length === 0) {
+        mountedContainer.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">此存档槽尚未挂载任何 TAG，请从上方下拉框选择添加。</div>';
+      } else {
+        tagIds.forEach((tid, index) => {
+          const t = appState.tags[tid];
+          if (!t) return;
+          const item = document.createElement('div');
+          item.className = 'mounted-tag-item';
+          const imgSrc = getTagImageSrc(t);
+          const thumbHtml = imgSrc
+            ? `<img class="mounted-thumb" src="${imgSrc}" />`
+            : `<div class="mounted-thumb" style="display:flex;align-items:center;justify-content:center;font-size:14px;">📄</div>`;
+
+          const noteSpan = t.title ? `<span style="color:var(--text-muted);font-weight:400;font-size:12px;">（备注: ${escapeHtml(t.title)}）</span>` : '';
+
+          item.innerHTML = `
+            <div class="mounted-tag-left">
+              ${thumbHtml}
+              <div style="overflow:hidden;">
+                <div style="font-size:13px;font-weight:600;color:#fff;">
+                  <span class="badge badge-tag" style="margin-right:6px;">#${escapeHtml(t.tag)}</span>${noteSpan}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;">
+                  ${escapeHtml(t.prompt || t.description || '仅图片无文本')}
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <button class="btn-sm" title="编辑此 TAG" onclick="selectTagForEdit('${tid}')">✏️</button>
+              <button class="btn-sm" title="上移" onclick="moveMountedTag(${index}, -1)">↑</button>
+              <button class="btn-sm" title="下移" onclick="moveMountedTag(${index}, 1)">↓</button>
+              <button class="btn-danger btn-sm" title="从当前槽位移除" onclick="removeTagFromSlot('${tid}')">✕</button>
+            </div>
+          `;
+          mountedContainer.appendChild(item);
+        });
+      }
+
+      updateSlotPreview(slot);
+    }
+
+    function updateSlotPreview(slot) {
+      const previewEl = document.getElementById('slotPromptPreview');
+      const tagIds = slot.tag_ids || [];
+      let lines = [];
+      let imgCount = 0;
+
+      tagIds.forEach((tid, i) => {
+        const t = appState.tags[tid];
+        if (!t) return;
+        // 注意：t.title 是仅面板备注，不加载进大模型上下文
+        let block = `${i + 1}. 【${t.tag}】`;
+        if (t.description) block += `\n   - 补充描述：${t.description}`;
+        if (t.prompt) block += `\n   - 核心设定与要求：${t.prompt}`;
+        if (t.image) {
+          imgCount++;
+          block += `\n   - [视觉通道将附带参考图: ${t.image}]`;
+        }
+        lines.push(block);
+      });
+
+      if (lines.length === 0 && !slot.slot_note) {
+        previewEl.textContent = "（当前槽位为空，不会向大模型注入任何额外信息）";
+        return;
+      }
+
+      const noteStr = slot.slot_note ? `存档全局说明：${slot.slot_note}\n` : '';
+      previewEl.textContent = `[🔥 当前激活存档点 · 节点重要补充信息 (共附带 ${imgCount} 张参考图)]:\n${noteStr}${lines.join('\n')}`;
+    }
+
+    function renderTagDropdowns() {
+      const mountSelect = document.getElementById('mountTagSelect');
+      const editDropdown = document.getElementById('tagSelectorDropdown');
+
+      mountSelect.innerHTML = '<option value="">-- 从下拉菜单选择已保存的 TAG --</option>';
+      editDropdown.innerHTML = '<option value="">-- ✨ 新建空白 TAG 条目 --</option>';
+
+      Object.values(appState.tags).forEach(t => {
+        const noteText = t.title ? ` (${t.title})` : (t.prompt ? ` - ${t.prompt.slice(0, 15)}...` : '');
+        const label = `[#${t.tag}]${noteText}${t.image ? ' 🖼️' : ''}`;
+
+        const opt1 = document.createElement('option');
+        opt1.value = t.id;
+        opt1.textContent = label;
+        mountSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = t.id;
+        opt2.textContent = label;
+        if (t.id === currentEditingTagId) opt2.selected = true;
+        editDropdown.appendChild(opt2);
+      });
+    }
+
+    function onSelectTagFromDropdown(tagId) {
+      if (!tagId) {
+        resetTagEditorForNew();
+        return;
+      }
+      selectTagForEdit(tagId);
+    }
+
+    function selectTagForEdit(tagId) {
+      const t = appState.tags[tagId];
+      if (!t) return;
+      currentEditingTagId = tagId;
+      pendingImageBase64 = "";
+      shouldClearImage = false;
+
+      document.getElementById('tagSelectorDropdown').value = tagId;
+      document.getElementById('tagNameInput').value = t.tag || '';
+      document.getElementById('tagTitleInput').value = t.title || '';
+      document.getElementById('tagDescInput').value = t.description || '';
+      document.getElementById('tagPromptInput').value = t.prompt || '';
+      document.getElementById('deleteTagBtn').style.display = 'inline-flex';
+
+      const previewImg = document.getElementById('tagImagePreview');
+      const clearBtn = document.getElementById('clearImgBtn');
+      const imgSrc = getTagImageSrc(t);
+      if (imgSrc) {
+        previewImg.src = imgSrc;
+        previewImg.style.display = 'inline-block';
+        clearBtn.style.display = 'inline-flex';
+      } else {
+        previewImg.style.display = 'none';
+        previewImg.src = '';
+        clearBtn.style.display = 'none';
+      }
+    }
+
+    function resetTagEditorForNew() {
+      currentEditingTagId = "";
+      pendingImageBase64 = "";
+      shouldClearImage = false;
+      document.getElementById('tagSelectorDropdown').value = "";
+      document.getElementById('tagNameInput').value = "";
+      document.getElementById('tagTitleInput').value = "";
+      document.getElementById('tagDescInput').value = "";
+      document.getElementById('tagPromptInput').value = "";
+      document.getElementById('tagImagePreview').style.display = 'none';
+      document.getElementById('clearImgBtn').style.display = 'none';
+      document.getElementById('deleteTagBtn').style.display = 'none';
+    }
+
+    const uploadZone = document.getElementById('uploadZone');
+    uploadZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        readImageFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelect(event) {
+      if (event.target.files && event.target.files[0]) {
+        readImageFile(event.target.files[0]);
+      }
+    }
+
+    function readImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        pendingImageBase64 = e.target.result;
+        shouldClearImage = false;
+        const previewImg = document.getElementById('tagImagePreview');
+        previewImg.src = pendingImageBase64;
+        previewImg.style.display = 'inline-block';
+        document.getElementById('clearImgBtn').style.display = 'inline-flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearCurrentTagImage() {
+      pendingImageBase64 = "";
+      shouldClearImage = true;
+      const previewImg = document.getElementById('tagImagePreview');
+      previewImg.style.display = 'none';
+      previewImg.src = '';
+      document.getElementById('clearImgBtn').style.display = 'none';
+    }
+
+    async function saveTag(mountImmediately) {
+      const tag = document.getElementById('tagNameInput').value.trim();
+      if (!tag) {
+        showToast("⚠️ 请先填写 TAG 标识名称！");
+        return;
+      }
+      const payload = {
+        id: currentEditingTagId,
+        tag: tag,
+        title: document.getElementById('tagTitleInput').value.trim(),
+        description: document.getElementById('tagDescInput').value.trim(),
+        prompt: document.getElementById('tagPromptInput').value.trim(),
+        image_base64: pendingImageBase64,
+        clear_image: shouldClearImage,
+        mount_to_slot: mountImmediately ? selectedSlotId : ""
+      };
+
+      const json = await apiRequest("tag/save", "POST", payload);
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        currentEditingTagId = json.tag_id;
+        pendingImageBase64 = "";
+        shouldClearImage = false;
+        renderAll();
+        selectTagForEdit(currentEditingTagId);
+        showToast(mountImmediately ? `🔥 已保存 TAG [#${tag}] 并挂入当前存档槽！` : `💾 已保存 TAG [#${tag}] 至资产库！`);
+      } else {
+        showToast("保存失败: " + (json.message || "未知错误"));
+      }
+    }
+
+    async function deleteCurrentTag() {
+      if (!currentEditingTagId) return;
+      if (!confirm("确定要彻底删除这个 TAG 及其关联图片吗？")) return;
+      const json = await apiRequest("tag/delete", "POST", { id: currentEditingTagId });
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        resetTagEditorForNew();
+        renderAll();
+        showToast("🗑️ 已删除该 TAG");
+      }
+    }
+
+    async function mountSelectedTagToSlot() {
+      const tid = document.getElementById('mountTagSelect').value;
+      if (!tid) {
+        showToast("请先从下拉菜单选择一个 TAG");
+        return;
+      }
+      const slot = appState.slots[selectedSlotId];
+      if (!slot) return;
+      slot.tag_ids = slot.tag_ids || [];
+      if (slot.tag_ids.includes(tid)) {
+        showToast("该 TAG 已经挂载在此存档槽中了哦");
+        return;
+      }
+      slot.tag_ids.push(tid);
+      await saveCurrentSlot(true);
+    }
+
+    async function removeTagFromSlot(tid) {
+      const slot = appState.slots[selectedSlotId];
+      if (!slot) return;
+      slot.tag_ids = (slot.tag_ids || []).filter(id => id !== tid);
+      await saveCurrentSlot(true);
+    }
+
+    async function moveMountedTag(index, direction) {
+      const slot = appState.slots[selectedSlotId];
+      if (!slot || !slot.tag_ids) return;
+      const targetIdx = index + direction;
+      if (targetIdx < 0 || targetIdx >= slot.tag_ids.length) return;
+      const temp = slot.tag_ids[index];
+      slot.tag_ids[index] = slot.tag_ids[targetIdx];
+      slot.tag_ids[targetIdx] = temp;
+      await saveCurrentSlot(true);
+    }
+
+    async function saveCurrentSlot(silent = false) {
+      const slot = appState.slots[selectedSlotId];
+      if (!slot) return;
+      const payload = {
+        id: selectedSlotId,
+        name: document.getElementById('slotNameInput').value.trim() || slot.name,
+        slot_note: document.getElementById('slotNoteInput').value.trim(),
+        tag_ids: slot.tag_ids || []
+      };
+      const json = await apiRequest("slot/save", "POST", payload);
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        renderAll();
+        if (!silent) showToast("💾 存档槽配置已保存！");
+      }
+    }
+
+    async function activateCurrentSelectedSlot() {
+      await saveCurrentSlot(true);
+      const json = await apiRequest("slot/activate", "POST", { slot_id: selectedSlotId });
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        renderAll();
+        showToast(`🔥 已点燃并激活【${appState.slots[selectedSlotId].name}】！`);
+      }
+    }
+
+    async function deactivateAll() {
+      const json = await apiRequest("slot/activate", "POST", { slot_id: 'none' });
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        renderAll();
+        showToast("⏸️ 已停用所有存档槽，恢复纯净会话。");
+      }
+    }
+
+    async function copyCurrentSlotTo() {
+      const toSlotId = document.getElementById('copyTargetSlotSelect').value;
+      if (!toSlotId) return;
+      await saveCurrentSlot(true);
+      const json = await apiRequest("slot/copy", "POST", { from_slot_id: selectedSlotId, to_slot_id: toSlotId });
+      if (json && json.status === 'ok') {
+        appState = json.data;
+        selectedSlotId = toSlotId;
+        renderAll();
+        showToast(`📋 已成功将挂载列表复制到【${appState.slots[toSlotId].name}】！`);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    fetchState();
+  </script>
+</body>
+</html>

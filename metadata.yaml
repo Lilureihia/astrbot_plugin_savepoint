@@ -1,0 +1,7 @@
+name: astrbot_plugin_savepoint
+display_name: 存档点 SavePoint
+desc: 手动存入当前节点重要的图文信息，支持多TAG组装与单存档槽切换的轻量上下文挂件
+help: 在插件卡片点击视图按钮或固定至左侧【扩展功能 -> 存档点】即可打开管理面板，也可发送 /sp_status 查看当前生效存档。
+version: 1.1.0
+author: 白昼夢
+repo: https://github.com/Lilureihia/astrbot_plugin_savepoint

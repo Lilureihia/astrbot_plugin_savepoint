@@ -1,0 +1,40 @@
+{
+  "enable_plugin": {
+    "description": "启用存档点注入",
+    "hint": "总开关：开启后，每次请求大模型时自动挂载当前激活存档槽内的图文信息",
+    "type": "bool",
+    "default": true
+  },
+  "webui_host": {
+    "description": "WebUI 监听地址",
+    "hint": "本地运行请填 127.0.0.1；若部署在云服务器或局域网需外部访问可填 0.0.0.0",
+    "type": "string",
+    "default": "127.0.0.1"
+  },
+  "webui_port": {
+    "description": "WebUI 监听端口",
+    "hint": "独立管理台端口，启动后也可直接访问 http://127.0.0.1:8765 打开面板",
+    "type": "int",
+    "default": 8765
+  },
+  "inject_images": {
+    "description": "多模态图片注入",
+    "hint": "当激活存档槽内的 TAG 包含参考图片时，自动附带进大模型的视觉请求中",
+    "type": "bool",
+    "default": true
+  },
+  "inject_position": {
+    "description": "文本注入位置",
+    "hint": "选择将存档点补充文本追加在系统提示词末尾（tail）还是插入在头部（head）",
+    "type": "string",
+    "default": "tail",
+    "options": [
+      "tail",
+      "head"
+    ],
+    "labels": [
+      "追加在系统提示词末尾 (tail)",
+      "插入在系统提示词头部 (head)"
+    ]
+  }
+}
