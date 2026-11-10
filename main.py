@@ -373,6 +373,7 @@ class SavePointPlugin(Star):
             app.router.add_post("/api/slot/copy", self._handle_copy_slot)
             app.router.add_get("/api/images/{filename}", self._handle_get_image)
             app.router.add_get("/api/logo", self._handle_get_logo)
+            app.router.add_get("/logo.png", self._handle_get_logo)
 
             self._runner = web.AppRunner(app)
             await self._runner.setup()
