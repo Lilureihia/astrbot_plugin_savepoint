@@ -7,7 +7,7 @@
 **手动存入当前节点重要的图文信息 · 支持多 TAG 自由组装与单存档槽切换的轻量上下文挂件**
 
 [![Version](https://img.shields.io/badge/Version-1.1.0-7c5cff?style=flat-square)](./CHANGELOG.md)
-[![AstrBot](https://img.shields.io/badge/AstrBot-%3E%3D4.29.0-ff8c42?style=flat-square)](https://github.com/AstrBotDevs/AstrBot)
+[![AstrBot](https://img.shields.io/badge/AstrBot-%3E%3D4.29.0-ff8c42?style=flat-square)](https://github.com/Soulter/AstrBot)
 [![License](https://img.shields.io/badge/License-MIT-4fd6be?style=flat-square)](./README.md)
 
 </div>
@@ -33,7 +33,7 @@
 插件安装并启用后，支持以下两种方式进入管理面板：
 1. **AstrBot 原生侧边栏入口（推荐）**：
    - 在 AstrBot 管理后台进入 **「插件」** 页面，找到 **「存档点 SavePoint」** 卡片；
-   - 点击卡片底部的 **「🖥️ 打开视图」** 按钮，或点击 **「📌 图钉」** 按钮将其固定至左侧导航栏 **「扩展功能 -> 存档点」**，即可随时在侧边栏一键切换。
+   - 点击卡片底部的 **[🖥️ 打开视图]** 按钮，或点击 **[📌 图钉]** 按钮将其固定至左侧导航栏 **「扩展功能 -> 存档点」**，即可随时在侧边栏一键切换。
 2. **独立端口直连**：
    - 在浏览器直接访问 `http://127.0.0.1:8765`（端口可在插件配置中修改）。
 
@@ -87,7 +87,7 @@
 - **文本注入位置 (`inject_position`)**：可选追加在系统提示词末尾（`tail`，默认推荐）或插入在头部（`head`）。
 
 ### 聊天端状态查询指令
-- **`/sp_status`**：In any chat window, send this command to quickly check the currently active save slot, mounted tags, and attached reference images.
+- **`/sp_status`**：在任意聊天窗口发送该指令，即可快速查看当前点燃激活的存档槽名称、已挂载的 TAG 列表及附带的参考图片数量。
 
 ---
 
